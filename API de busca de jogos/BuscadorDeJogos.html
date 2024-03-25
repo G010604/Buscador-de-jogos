@@ -17,25 +17,17 @@
             var apiKey = 'd209e82699274d69bc9dc1012f9b73b7';
             var url = "https://api.rawg.io/api/games?search=" + encodeURIComponent(nomeJogo) + "&key=" + apiKey;
 
-            return new Promise(function(resolve, reject) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url, true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        var response = JSON.parse(xhr.responseText);
-                        resolve(response);
-                    } else {
-                        reject("Erro ao buscar jogo. Por favor, tente novamente mais tarde.");
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Erro ao buscar jogo. Por favor, tente novamente mais tarde.");
                     }
-                }
-            };
-            xhr.send();
-            }).then(function(response) {
-                exibirResultados(response);
-            }).catch(function(error) {
-                mensagemErro.textContent = error;
-            });
+                    return response.json();
+                })
+                .then(response => exibirResultados(response))
+                .catch(error => {
+                    mensagemErro.textContent = error.message;
+                });
         }
 
         function exibirResultados(response) {
@@ -47,10 +39,15 @@
                 var plataforma = jogo.platforms.map(function (plataforma) {
                     return plataforma.platform.name;
                 }).join(", ");
+                var imagem = jogo.background_image;
+
+                var imgElement = document.createElement("img");
+                imgElement.src = imagem;
 
                 var pElement = document.createElement("p");
                 pElement.textContent = titulo + " - Plataformas: " + plataforma;
 
+                resultadosDiv.appendChild(imgElement);
                 resultadosDiv.appendChild(pElement);
             });
         }
