@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buscador de jogos</title>
     <script>
-        function buscarJogo() {
+        async function buscarJogo() {
             var nomeJogo = document.getElementById("nomeJogo").value.trim();
             var mensagemErro = document.getElementById("mensagemErro");
 
@@ -17,17 +17,16 @@
             var apiKey = 'd209e82699274d69bc9dc1012f9b73b7';
             var url = "https://api.rawg.io/api/games?search=" + encodeURIComponent(nomeJogo) + "&key=" + apiKey;
 
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Erro ao buscar jogo. Por favor, tente novamente mais tarde.");
-                    }
-                    return response.json();
-                })
-                .then(response => exibirResultados(response))
-                .catch(error => {
-                    mensagemErro.textContent = error.message;
-                });
+            try {
+                var response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error("Erro ao buscar jogo. Por favor, tente novamente mais tarde.");
+                }
+                var data = await response.json();
+                exibirResultados(data);
+            } catch (error) {
+                mensagemErro.textContent = error.message;
+            }
         }
 
         function exibirResultados(response) {
