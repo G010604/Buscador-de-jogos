@@ -17,19 +17,17 @@
             var apiKey = 'd209e82699274d69bc9dc1012f9b73b7';
             var url = "https://api.rawg.io/api/games?search=" + encodeURIComponent(nomeJogo) + "&key=" + apiKey;
 
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url, true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        var response = JSON.parse(xhr.responseText);
-                        exibirResultados(response);
-                    } else {
-                        mensagemErro.textContent = "Erro ao buscar jogo. Por favor, tente novamente mais tarde.";
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Erro ao buscar jogo. Por favor, tente novamente mais tarde.");
                     }
-                }
-            };
-            xhr.send();
+                    return response.json();
+                })
+                .then(response => exibirResultados(response))
+                .catch(error => {
+                    mensagemErro.textContent = error.message;
+                });
         }
 
         function exibirResultados(response) {
